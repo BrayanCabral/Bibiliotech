@@ -1,0 +1,18 @@
+# Ambiente Python
+python_env/
+__pycache__/
+*.pyc
+
+# Banco de dados local (dados de teste, contem hashes de senha)
+*.db
+
+# Segredos locais (nunca versionar - use .env.example como referencia)
+.env
+
+# Configuracoes locais do Claude Code
+.claude/
+
+# Capas de livros baixadas automaticamente
+static/covers/*
+
+run_bibliotech.bat

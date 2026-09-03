@@ -1,0 +1,5 @@
+* text=auto
+Procfile text eol=lf
+*.py text eol=lf
+*.yaml text eol=lf
+runtime.txt text eol=lf

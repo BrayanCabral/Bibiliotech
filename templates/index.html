@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiblioTech - Biblioteca Online de Programação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+
+    <!-- =========================================================
+         AUTH WALL - Exibido antes do login
+    ========================================================== -->
+    <div id="authWall" class="auth-wall">
+        <div class="auth-box">
+            <button class="modal-close" id="btnCloseAuthWall" title="Continuar sem entrar">
+                <i data-feather="x"></i>
+            </button>
+            <div class="auth-brand">
+                <div class="brand-icon" style="margin: 0 auto 16px;">
+                    <i data-feather="book-open"></i>
+                </div>
+                <h1>BiblioTech</h1>
+                <p>Biblioteca Online de Programação</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="showTab('login')">Entrar</button>
+                <button class="auth-tab" id="tabRegister" onclick="showTab('register')">Cadastrar</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <div class="input-icon">
+                        <i data-feather="user"></i>
+                        <input type="text" id="loginUsername" placeholder="Seu nome de usuário" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="input-icon">
+                        <i data-feather="lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Sua senha" required>
+                    </div>
+                </div>
+                <div id="loginError" class="auth-error" style="display:none;"></div>
+                <button type="submit" class="btn btn-primary btn-full" id="btnLogin">
+                    <i data-feather="log-in"></i> Entrar na Biblioteca
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form" style="display:none;" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Nome de Usuário</label>
+                    <div class="input-icon">
+                        <i data-feather="user"></i>
+                        <input type="text" id="regUsername" placeholder="Escolha um nome de usuário" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <div class="input-icon">
+                        <i data-feather="mail"></i>
+                        <input type="email" id="regEmail" placeholder="seu@email.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="input-icon">
+                        <i data-feather="lock"></i>
+                        <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required>
+                    </div>
+                </div>
+                <div id="registerError" class="auth-error" style="display:none;"></div>
+                <button type="submit" class="btn btn-primary btn-full" id="btnRegister">
+                    <i data-feather="user-plus"></i> Criar Conta
+                </button>
+            </form>
+
+            <!-- Verify Code Form -->
+            <form id="verifyForm" class="auth-form" style="display:none;" onsubmit="handleVerify(event)">
+                <div class="verify-info">
+                    <i data-feather="mail" style="width:40px;height:40px;color:var(--accent-primary);"></i>
+                    <p>Digite o código de 6 dígitos enviado para <strong id="verifyEmailLabel"></strong></p>
+                </div>
+                <div class="form-group">
+                    <label>Código de Confirmação</label>
+                    <div class="input-icon">
+                        <i data-feather="key"></i>
+                        <input type="text" id="verifyCode" placeholder="Ex: 847293" maxlength="6" required
+                               style="font-size:1.4rem;letter-spacing:8px;text-align:center;">
+                    </div>
+                </div>
+                <div id="verifyError" class="auth-error" style="display:none;"></div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i data-feather="check-circle"></i> Confirmar Código
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         APP PRINCIPAL - Visível após o login
+    ========================================================== -->
+    <div id="appMain" style="display:none;">
+
+        <!-- Top Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <i data-feather="book-open"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1>BiblioTech</h1>
+                        <span class="badge-network"><i data-feather="wifi"></i> 192.168.2.8:5000</span>
+                    </div>
+                </div>
+
+                <div class="search-bar">
+                    <i data-feather="search" class="search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por título, autor, tecnologia...">
+                </div>
+
+                <div class="nav-actions">
+                    <span id="userBadge" class="user-badge"></span>
+                    <button class="btn btn-secondary" id="btnFavoritesFilter">
+                        <i data-feather="heart"></i> <span class="btn-label">Favoritos</span>
+                    </button>
+                    <button class="btn btn-secondary" id="btnCategoriesMobile" onclick="toggleCategoryMenu()">
+                        <i data-feather="grid"></i> <span class="btn-label">Categorias</span>
+                    </button>
+                    <button class="btn btn-primary" id="btnScan">
+                        <i data-feather="refresh-cw"></i> <span class="btn-label">Escanear</span>
+                    </button>
+                    <button class="btn btn-secondary" id="btnLoginNav" onclick="showAuthWall()" style="display:none;">
+                        <i data-feather="log-in"></i> <span class="btn-label">Entrar</span>
+                    </button>
+                    <button class="btn btn-danger" id="btnLogout" onclick="handleLogout()" style="display:none;">
+                        <i data-feather="log-out"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Category Dropdown Menu -->
+        <div id="mobileCategoryMenu" class="mobile-cat-menu" style="display:none;">
+            <div class="mobile-cat-header">
+                <span>Categorias Técnicas</span>
+                <button onclick="toggleCategoryMenu()"><i data-feather="x"></i></button>
+            </div>
+            <div id="mobileCatList" class="mobile-cat-list">
+                <!-- Injetado via JS -->
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <main class="app-container">
+
+            <!-- Hero Stats Section -->
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon bg-indigo"><i data-feather="book"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statTotalBooks">0</h3>
+                        <p>Livros Catalogados</p>
+                    </div>
+                </div>
+
+                <!-- Card de Espaço em Disco - apenas para master -->
+                <div class="stat-card" id="statDiskCard" style="display:none;">
+                    <div class="stat-icon bg-emerald"><i data-feather="hard-drive"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statTotalGB">0 GB</h3>
+                        <p>Espaço em Disco</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-amber"><i data-feather="check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statReadBooks">0</h3>
+                        <p>Livros Lidos</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-purple"><i data-feather="grid"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statCategories">0</h3>
+                        <p>Categorias Técnicas</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categories & Filters Bar -->
+            <section class="filter-section">
+                <div class="categories-scroll" id="categoriesContainer">
+                    <button class="cat-pill active" data-category="">Todos os Livros</button>
+                </div>
+                <div class="sort-selector">
+                    <label for="sortSelect"><i data-feather="sliders"></i> Ordenar:</label>
+                    <select id="sortSelect">
+                        <option value="title">Título (A-Z)</option>
+                        <option value="added_desc">Mais Recentes</option>
+                        <option value="size_desc">Maior Tamanho (MB)</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Books Grid -->
+            <section class="books-section">
+                <div class="section-header">
+                    <h2 id="gridTitle">Acervo de Livros</h2>
+                    <span class="count-badge" id="booksCount">0 obras</span>
+                </div>
+                <div class="books-grid" id="booksGrid">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Resumo do Livro -->
+    <div class="modal-overlay" id="summaryModal">
+        <div class="modal-container modal-lg">
+            <button class="modal-close" id="btnCloseSummary"><i data-feather="x"></i></button>
+            <div class="modal-body" id="modalSummaryBody"></div>
+        </div>
+    </div>
+
+    <!-- Modal Leitor de PDF Incorporado -->
+    <div class="modal-overlay" id="readerModal">
+        <div class="modal-container modal-fullscreen">
+            <div class="reader-header">
+                <div class="reader-title">
+                    <i data-feather="book-open"></i>
+                    <span id="readerBookTitle">Leitor de Livro</span>
+                </div>
+                <button class="modal-close-reader" id="btnCloseReader"><i data-feather="x"></i> FECHAR</button>
+            </div>
+            <div class="reader-body">
+                <iframe id="pdfFrame" src="about:blank" title="Visualizador de PDF"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Arquimedes -->
+    <button id="btnArquimedesToggle" class="arquimedes-fab" title="Falar com o Arquimedes">
+        <i data-feather="message-circle"></i>
+    </button>
+
+    <div id="arquimedesChat" class="arquimedes-chat">
+        <div class="arquimedes-header">
+            <div class="arquimedes-header-info">
+                <div class="arquimedes-avatar"><i data-feather="cpu"></i></div>
+                <div>
+                    <h4>Arquimedes</h4>
+                    <span>Seu guia de leitura</span>
+                </div>
+            </div>
+            <button id="btnCloseArquimedes" class="modal-close-reader" style="padding:6px;"><i data-feather="x"></i></button>
+        </div>
+        <div id="arquimedesMessages" class="arquimedes-messages"></div>
+        <form id="arquimedesForm" class="arquimedes-input-bar">
+            <input type="text" id="arquimedesInput" placeholder="Pergunte qual livro ler..." autocomplete="off" required>
+            <button type="submit" class="btn btn-primary" id="btnArquimedesSend">
+                <i data-feather="send"></i>
+            </button>
+        </form>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
